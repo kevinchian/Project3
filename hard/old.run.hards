@@ -1,0 +1,10 @@
+echo '===================================================================='
+echo '=== donkey (min 83 moves)'
+echo '--- test 1'
+runsuccess.csh init.from.handout goal.1.from.handout
+echo '=== century (min ?? moves)'
+echo '--- test 2'
+runsuccess.csh handout.config.2 goal.1.from.handout
+echo '=== century 1.5 (min ?? moves)'
+echo '--- test 3'
+runsuccess.csh handout.config.2 century.1.5.goal
