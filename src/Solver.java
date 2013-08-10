@@ -33,20 +33,24 @@ public class Solver {
             InputSource goalInput = new InputSource(args[1]);
             
             String dimensions = initialBoardState.readLine(); //reads first line of input, which are dimensions
-            String goalString = goalInput.readLine();
             String[] boardDimension = dimensions.split(" ");
-            String[] goalLocation = goalString.split(" ");
+            int height = Integer.parseInt(boardDimension[0]);
+            int width = Integer.parseInt(boardDimension[1]);
+            board = new Tray(height, width);
             
-            int width = Integer.parseInt(boardDimension[0]);
-            int height = Integer.parseInt(boardDimension[1]);
-            int goalX1 = Integer.parseInt(goalLocation[0]);
-            int goalY1 = Integer.parseInt(goalLocation[1]);
-            int goalX2 = Integer.parseInt(goalLocation[2]);
-            int goalY2 = Integer.parseInt(goalLocation[3]);
-            
-            Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
-            board = new Tray(width, height, goal);
-            
+            while(true){
+            	String goalString = goalInput.readLine();
+            	if(goalString == null){
+            		break;
+            	}
+                String[] goalLocation = goalString.split(" ");
+                int goalX1 = Integer.parseInt(goalLocation[0]);
+                int goalY1 = Integer.parseInt(goalLocation[1]);
+                int goalX2 = Integer.parseInt(goalLocation[2]);
+                int goalY2 = Integer.parseInt(goalLocation[3]); 
+                Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
+                board.addGoals(goal);
+            }
             while (true) {
                 // Read a line from the input file.
                 String line = initialBoardState.readLine ( );

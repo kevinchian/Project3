@@ -7,16 +7,19 @@ public class Tray {
 	private ArrayList<Tray> possibleMoves;
 	private int[][] tray;
 	private static int blockID;
-	private ArrayList<Block> goal;
+	private ArrayList<Block> goals; // Edit: There can be more than one goal block.
 	private static boolean iAmDebugging = true;
 	
-	public Tray(int trayHeight, int trayWidth, Block end){
+	public Tray(int trayHeight, int trayWidth){
 		blockID = 0;
 		tray = new int[trayHeight][trayWidth];
 		blocks = new HashMap<Integer, Block>();
-		goal = end;
+		goals = new ArrayList<Block>();
 	}
 	
+	public void addGoals(Block b){
+		goals.add(b);
+	}
 
 	public void add(Block b){
 		blockID++;
@@ -40,10 +43,6 @@ public class Tray {
 		
 	}
 	
-	public Block goal(){
-		return goal;
-	}
-	
 	public ArrayList<Tray> moves(){
 		return possibleMoves;
 	}
@@ -53,14 +52,16 @@ public class Tray {
 	}
 	
 	public boolean finished(){
-		int blockNumber = tray[goal.upperLeftCorner().x][goal.upperLeftCorner().y];
-		if(blockNumber == 0){
-			return false;
-		}
-		Block b = blocks.get(blockNumber);
-		if(b.upperLeftCorner().equals(goal.upperLeftCorner()) && b.height()==goal.height()
-				&& b.width()==goal.width()){
-			return true;
+		for(Block goal : goals){
+			int blockNumber = tray[goal.upperLeftCorner().x][goal.upperLeftCorner().y];
+			if(blockNumber == 0){
+				return false;
+			}
+			Block b = blocks.get(blockNumber);
+			if(b.upperLeftCorner().equals(goal.upperLeftCorner()) && b.height()==goal.height()
+					&& b.width()==goal.width()){
+				return true;
+			}
 		}
 		return false;
 	}
