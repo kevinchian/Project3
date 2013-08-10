@@ -1,17 +1,11 @@
-import static org.junit.Assert.*;
 import junit.framework.TestCase;
-
-import org.junit.Test;
-
 
 public class BlockTest extends TestCase{
 	
-	@Test
 	public void testConstructor() {
 		Block b = new Block(1,2,3,4);
 	}	
 	
-	@Test
 	public void testCopy(){
 		Block b3 = new Block(123,182,200,122); // random block
 		Block copyb3 = b3.copy();
@@ -22,7 +16,6 @@ public class BlockTest extends TestCase{
 		assertEquals(copyb3.toString(),"Position is (123,182). Height is 77 and Width is 60.");
 	}
 	
-	@Test
 	public void testOne() {
 		
 		Block b1 = new Block(0,0,1,1); // 1x1 block
@@ -57,8 +50,7 @@ public class BlockTest extends TestCase{
 		}
 		*/
 	}
-	
-	@Test
+
 	public void testPosition(){
 		Block b = new Block(123,182,200,122); // random block
 		assertTrue(b.upperLeftCorner().x == 123);

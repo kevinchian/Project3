@@ -1,6 +1,5 @@
 import java.awt.Point;
 
-
 public class Block {
 
 	private Point upperLeft; //x axis first then y

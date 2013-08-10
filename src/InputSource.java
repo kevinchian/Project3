@@ -1,4 +1,3 @@
-import java.util.*;
 import java.io.*;
 
 // A class that generates lines from the input.
