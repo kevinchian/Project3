@@ -20,11 +20,11 @@ public class Block {
 		if (j == j2) {
 			throw new IllegalArgumentException("Block size is invalid");
 		} else if (j > j2) {
-			left = j;
-			right = j2;
-		} else {
-			left = j2;
 			right = j;
+			left = j2;
+		} else {
+			right = j2;
+			left = j;
 		}
 	}
 	
@@ -52,7 +52,7 @@ public class Block {
 		return new Block(top, left, bottom, right);
 	}
 	public String toString(){
-		return "Block<"+width()+"x"+height()+"@i,j=["+top+","+left+"]>";
+		return "Block<("+width()+"x"+height()+")@["+top+","+left+"]>";
 	}
 	public boolean intersects(Block b){
 		boolean colX = left < b.right && b.left < right;
