@@ -23,7 +23,7 @@ public class SolverTest {
         Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
         System.out.println("goal: " + goal.toString());
         assertEquals(goal.toString(), "Position is (139,139). Height is 1 and Width is 1.");
-        board = new Tray(width, height, goal);
+        board = new Tray(width, height);
         System.out.println(board.toString());
         while (true) {
             // Read a line from the input file.
