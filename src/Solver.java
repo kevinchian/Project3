@@ -1,10 +1,23 @@
+import java.util.HashSet;
+
 
 public class Solver {
+	
+	private static boolean iAmDebugging = true;
+	private HashSet<Tray> previousStates;
 
 	// Create a graph structure with nodes representing 1 move board states. 
 	// Depth First search
 	// Check HashCode by Saturday
 	public Solver(Tray board){
+		previousStates = new HashSet<Tray>();
+	}
+	
+	// Continue solving
+	// use fringe
+	// heuristic function
+	// breadth first search
+	public void solve(){
 		
 	}
 	
@@ -12,29 +25,34 @@ public class Solver {
 		
 	   Tray board;
 	   if (args.length == 3){
-		   
+		   // -o options. Implement later
+		   // -otime, -oinfo, -odebug, 
 	   }
 	   if (args.length == 2) {
-            InputSource lines = new InputSource (args[0]);
+            InputSource initialBoardState = new InputSource (args[0]);
             InputSource goalInput = new InputSource(args[1]);
-            String dimensions = lines.readLine();
+            
+            String dimensions = initialBoardState.readLine(); //reads first line of input, which are dimensions
             String goalString = goalInput.readLine();
-            String[] goalDimen = goalString.split(" ");
-            String[] dimensionArr = dimensions.split(" ");
-            int width = Integer.parseInt(dimensionArr[0]);
-            int height = Integer.parseInt(dimensionArr[1]);
-            int goalX1 = Integer.parseInt(goalDimen[0]);
-            int goalY1 = Integer.parseInt(goalDimen[0]);
-            int goalX2 = Integer.parseInt(goalDimen[0]);
-            int goalY2 = Integer.parseInt(goalDimen[0]);
+            String[] boardDimension = dimensions.split(" ");
+            String[] goalLocation = goalString.split(" ");
+            
+            int width = Integer.parseInt(boardDimension[0]);
+            int height = Integer.parseInt(boardDimension[1]);
+            int goalX1 = Integer.parseInt(goalLocation[0]);
+            int goalY1 = Integer.parseInt(goalLocation[1]);
+            int goalX2 = Integer.parseInt(goalLocation[2]);
+            int goalY2 = Integer.parseInt(goalLocation[3]);
+            
             Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
-
             board = new Tray(width, height, goal);
-         
+            
             while (true) {
                 // Read a line from the input file.
-                String line = lines.readLine ( );
-                System.out.println(line);
+                String line = initialBoardState.readLine ( );
+                if(iAmDebugging){
+                	System.out.println(line);
+                }
                 if(line == null){
                 	break;
                 }
@@ -49,17 +67,8 @@ public class Solver {
             
 	   }
 	   else{
-		   throw new IllegalArgumentException("Need 2 arguments");
+		   throw new IllegalArgumentException("Illegal amount of arguments: " + args.length);
 	   } 
-	   System.out.println(board.toString());
-	}
-	
-	// Continue solving
-	// use fringe
-	// heuristic function
-	// breadth first search
-	public void solve(){
-		
 	}
 }
 	   
