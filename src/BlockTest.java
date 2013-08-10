@@ -4,11 +4,12 @@ public class BlockTest extends TestCase{
 	
 	public void testConstructor() {
 		Block b = new Block(1,2,3,4);
+		System.out.println(b);
 	}	
 	
 	public void testCopy(){
 		Block b3 = new Block(123,182,200,122); // random block
-		Block copyb3 = b3.copy();
+		Block copyb3 = b3.clone();
 		
 		System.out.println(copyb3.height());
 		assertFalse(copyb3.height()==78);
@@ -53,8 +54,8 @@ public class BlockTest extends TestCase{
 
 	public void testPosition(){
 		Block b = new Block(123,182,200,122); // random block
-		assertTrue(b.upperLeftCorner().x == 123);
-		assertTrue(b.upperLeftCorner().y == 182);
+		assertTrue(b.top() == 123);
+		assertTrue(b.left() == 182);
 		
 	}
 	

@@ -2,7 +2,7 @@ import java.awt.Point;
 
 public class Block {
 
-	private static int idCounter = 0;
+	private static int idCounter = 1;
 	
 	private int id;
 	private int top;
