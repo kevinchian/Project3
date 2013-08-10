@@ -2,6 +2,9 @@ import java.awt.Point;
 
 public class Block {
 
+	private static int idCounter = 0;
+	
+	private int id;
 	private int top;
 	private int bottom;
 	private int left;
@@ -26,8 +29,13 @@ public class Block {
 			right = j2;
 			left = j;
 		}
+		this.id = idCounter;
+		idCounter++;
 	}
 	
+	public int id() {
+		return id;
+	}
 	public int top() {
 		return top;
 	}
