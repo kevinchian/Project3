@@ -19,6 +19,9 @@ public class TrayTest extends TestCase {
 //		
 //		System.out.print(t.toString());
 //		
+	
+		
+//  we can have more than one lines goal configuration.
 		
 		
 	}
