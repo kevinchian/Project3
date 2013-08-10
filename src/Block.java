@@ -2,50 +2,61 @@ import java.awt.Point;
 
 public class Block {
 
-	private Point upperLeft; //x axis first then y
-	private int height; //corresponds to measurements in x axis
-	private int width; //corresponds to measurements in y axis
+	private int top;
+	private int bottom;
+	private int left;
+	private int right;
 	
-	// Hashcode runs as fast as possible
-	// Block constructor
-	public Block(int x1, int y1, int x2, int y2){
-		upperLeft = new Point(x1, y1);
-		height = Math.abs(x2 - x1) + 1; // I don't think math.abs is needed
-		width = Math.abs(y2-y1) + 1;
-		
+	public Block(int i, int j, int i2, int j2){
+		if (i == i2) {
+			throw new IllegalArgumentException("Block size is invalid");
+		} else if (i > i2) {
+			bottom = i;
+			top = i2;
+		} else {
+			bottom = i2;
+			top = i;
+		}
+		if (j == j2) {
+			throw new IllegalArgumentException("Block size is invalid");
+		} else if (j > j2) {
+			left = j;
+			right = j2;
+		} else {
+			left = j2;
+			right = j;
+		}
+	}
+	
+	public int top() {
+		return top;
+	}
+	public int bottom() {
+		return bottom;
+	}
+	public int left() {
+		return left;
+	}
+	public int right() {
+		return right;
 	}
 	
 	public int height(){
-		if(height==0)
-			throw new IllegalArgumentException("Block size is invalid");
-		return height;
+		return bottom - top;
 	}
 	
 	public int width(){
-		if(width==0)
-			throw new IllegalArgumentException("Block size is invalid");
-		return width;
+		return right - left;
 	}
-	
-	public Point upperLeftCorner(){
-		return upperLeft;
+	public Block clone(){
+		return new Block(top, left, bottom, right);
 	}
-	
-	public Block copy(){
-		int x1 = upperLeft.x;
-		int y1 = upperLeft.y;
-		int x2 = x1 + height - 1;
-		int y2 = y1 + width - 1;
-		return new Block(x1, y1, x2, y2);
-	}
-	
-	
 	public String toString(){
-		return "Position is ("+ upperLeft.x+","+ upperLeft.y+")."+ " Height is "+height+ " and "+ "Width is "+ width+".";
+		return "Block<"+width()+"x"+height()+"@i,j=["+top+","+left+"]>";
 	}
-	
-	// return true if argument intersects
-	public boolean intersect(){
-		return true;
+	public boolean intersects(Block b){
+		boolean colX = left < b.right && b.left < right;
+		boolean rowX = top < b.bottom && b.top < bottom;
+		return colX && rowX;
 	}
 }
