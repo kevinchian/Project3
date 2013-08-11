@@ -62,7 +62,7 @@ public class Block {
 		return new Block(top, left, bottom, right);
 	}
 	public String toString(){
-		return "Block<("+width()+"x"+height()+")@["+top+","+left+"]>";
+		return "Block<("+height()+"x"+width()+")@["+top+","+left+"]>";
 	}
 	public boolean intersects(Block b){
 		boolean colX = left < b.right && b.left < right;
