@@ -84,16 +84,31 @@ public class Tray {
 	
 	public String toString(){
 		// josh
-		String rtn = "";
 		
-		while(blocks.iterator().hasNext()){
-			rtn+= "BlockID: " + blocks.iterator().next() + " ";
-		}
+		String rtn="";
+		
+		
 		for(int i = 0; i < tray.length; i++){
 			for(int j = 0; j < tray[i].length; j++){
-				System.out.print(tray[i][j] + " ");
+				if(tray[i][j]==-1){
+					rtn+="|*|";
+				}
+				if(tray[i][j]==0){
+					rtn+="|0|";
+				}
+				else{
+					if(j==0 && j+1<tray[i].length && tray[i][j+1]>0) //first x and next is x
+						rtn+="|2 ";
+					else if(j!=0 && j+1<tray[i].length && tray[i][j+1]>0) //next is x
+						rtn+="|2 ";
+					else if(j!=0 && j+1<tray[i].length && tray[i][j-1]>0) //prev is x
+						rtn+=" 2|";
+					else
+						rtn+="|2|";
+						
+				}
 			}
-			System.out.println("");
+			rtn+="\n";
 		}	
 		
 		return rtn;
@@ -145,6 +160,21 @@ public class Tray {
 		}
 		return false;
 	}
+	
+	
+	public static void main(String args[]){
+		Tray t = new Tray(5, 5);
+		Block b1 = new Block(0, 0, 2, 3);
+		System.out.print(b1.toString());
+		Block b2 = new Block(2, 2, 4, 4);
+		System.out.print(b2.toString());
+		System.out.print("\n");
+		t.add(b1);
+		t.add(b2);
+		System.out.print(t.toString());
+	
+	}
+	
 	
 	
 }
