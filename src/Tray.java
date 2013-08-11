@@ -9,7 +9,8 @@ public class Tray {
 	private int width;
 	private int[][] tray;
 	private HashMap<Integer, Block> blocks;
-	private ArrayList<Point> emptySpace; // maybe we need this to keep track of empty space? tbd.
+	// don't keep track of empty blocks since we will create a billion trays
+	// and keeping all the empty blocks will be very memory-intensive
 	
 	public Tray(int trayHeight, int trayWidth){
 		this.height = trayHeight;
@@ -21,9 +22,21 @@ public class Tray {
 	// Sometimes the goal file can have out of bounds goals. We need to catch these in the Solver class and say no solution
 	public void add(Block b){
 		for(int i=b.top(); i<b.bottom(); i++)
-			for(int j=b.left(); j<b.right(); j++)
+			for(int j=b.left(); j<b.right(); j++) {
+				if (i >= height || j >= width || i < 0 || j < 0 )
+					throw new IllegalStateException("block out of bounds");
+				if (tray[i][j]!=0)
+					throw new IllegalStateException("conflicting block positions");
 				tray[i][j] = b.id();
+			}
 		blocks.put(b.id(), b);
+	}
+	
+	private void remove(Block b) {
+		blocks.remove(b.id());
+		for(int i=b.top(); i<b.bottom(); i++)
+			for(int j=b.left(); j<b.right(); j++)
+				tray[i][j] = 0;
 	}
 	
 	public void isOK(){
@@ -37,72 +50,101 @@ public class Tray {
 				}
 		if (!comparision.equals(tray))
 			throw new IllegalStateException("inconsistency between blocks and tray");
-		/* todos:
-		 * 1. update block tests to reflect the new block class (done)
-		 * make sure to test block.intersect(b) thoroughly
-		 * 2. write a tray.clone() method for tray
-		 * 3. write 2 different version of tray.moves(), one that finds
-		 * next moves from a list of empty spaces, and one that finds
-		 * next moves from a list of non-empty spaces. then benchmark them.
-		 * you'll probably need to use the tray.clone() method. make sure to
-		 * update both tray.tray and tray.blocks. make sure to also run the isOK
-		 * method to validate the state of your future trays after creating them
-		 * 4. benchmark the different tray.moves() methods and see which one
-		 * is better
-		 * 5. 
-		 */
 	}
 	
-	/*
-	 * input:
-	 * 5x5 tray, 2 blocks
-	 * Tray.tray:
-	 * 2 2 2 0 0
-	 * 2 2 2 0 0
-	 * 0 0 1 1 0
-	 * 0 0 1 1 0
-	 * -1 0 0 0 -1
-	 * 
-	 * block id 0 is empty space
-	 * block id -1 is wildcard character (ask kevin)
-	 * 
-	 * output:
-	 * +-----------+-------+
-	 * | x   x   x |       |
-	 * |           |       |
-	 * | x   x   x |       |
-	 * +-------+---+---+   |
-	 * |       | x   x |   |
-	 * |       |       |   |
-	 * |       | x   x |   |
-	 * +---+   +-------+---|
-	 * | * |           | * |
-	 * +---+---------------+
+	public int hashCode() {
+		return tray.hashCode();
+	}
+	
+	/* returns 1 if the block at [i,j] can move in direction
+	 * direction is either u, d, l, or r
+	 * returns 0 if the block cannot move in that direction
+	 * returns -1 if no block found at [i,j]
+	 * runs in O(1) time, provided block sizes aren't too big
 	 */
-	
-	public ArrayList<Tray> moves(){
-		Tray copy = this.clone();
-		return null;
+	private int canMove(int i, int j, char direction) {
+		if (i<0 || i >= height || j<0 || j >= width)
+			return -1;
+		if (tray[i][j] == 0)
+			return -1;
+		int id = tray[i][j];
+		Block b = blocks.get(id);
+		if (direction == 'u') {
+			int i2 = i - 1;
+			if (i2 < 0) return 0;
+			for (int j2=b.left(); j2<b.right(); j2++)
+				if (tray[i2][j2] != 0) return 0;
+		} else if (direction == 'd') {
+			int i2 = i + 1;
+			if (i2 >= height) return 0;
+			for (int j2=b.left(); j2<b.right(); j2++)
+				if (tray[i2][j2] != 0) return 0;
+		} else if (direction == 'l') {
+			int j2 = j - 1;
+			if (j2 < 0) return 0;
+			for (int i2=b.top(); i2<b.bottom(); i2++)
+				if (tray[i2][j2] != 0) return 0;
+		} else if (direction == 'r') {
+			int j2 = j + 1;
+			if (j2 >= width) return 0;
+			for (int i2=b.top(); i2<b.bottom(); i2++)
+				if (tray[i2][j2] != 0) return 0;
+		}
+		return 1;
 	}
 	
+	/* iterates through all of the blank spaces, finds blocks above,
+	 * below, left or right, and invites the blocks to fill up the
+	 * each blank space
+	 * should run in O(n) time, where n is the number of blank spaces
+	 */
+	public HashSet<Tray> moves(){
+		HashSet<Tray> possible = new HashSet<Tray>();
+		for (int i=0; i<height; i++)
+			for (int j=0; j<width; j++)
+				if (tray[i][j] == 0) {
+					possible.add(invite(i,j,'u'));
+					possible.add(invite(i,j,'d'));
+					possible.add(invite(i,j,'l'));
+					possible.add(invite(i,j,'r'));
+				}
+		return possible;
+	}
+	
+	/* returns Tray that's a result of inviting a block from direction d
+	 * returns null if no block can move from that direction
+	 * input: i, j is the empty space that is inviting
+	 * d is the direction that the empty space will invite from
+	 * runs in O(1) time, provided block sizes aren't too big
+	 * may be bottle necked by the .clone method
+	 */
+	private Tray invite(int i, int j, char d) {
+		// change direction to point in the direction that block will move
+		// change i, j to point to the block in that direction
+		switch (d) {
+			case 'u': d = 'd'; i = i-1; break;
+			case 'd': d = 'u'; i = i+1; break;
+			case 'l': d = 'r'; j = j-1; break;
+			case 'r': d = 'l'; j = j+1; break;
+		}
+		
+		if (canMove(i, j, d) != 1) return null;
+		Block b = blocks.get(tray[i][j]); 
+		Tray t = this.clone();
+		t.remove(b);
+		t.add(b.move(d));
+		return t;
+	}
 	
 	public String toString(){
-		// josh
-		
 		String rtn="";
-		
-		
 		for(int i = 0; i < tray.length; i++){
 			for(int j = 0; j < tray[i].length; j++){
-				if(tray[i][j]==-1){
+				if (tray[i][j]==-1)
 						rtn+="|*|";
-				}
-				
-				else if(tray[i][j]==0){
+				else if (tray[i][j]==0)
 					rtn+="|0|";
-				}
-				
-				else{
+				else {
 					if(j==0 && j+1<tray[i].length && tray[i][j+1]>0) //first x and next is x
 						rtn+="|"+ tray[i][j]+" ";
 					else if(j!=0 && j+1<tray[i].length && tray[i][j+1]>0 && tray[i][j-1]>0)
@@ -118,7 +160,6 @@ public class Tray {
 			}
 			rtn+="\n";
 		}	
-		
 		return rtn;
 	}
 	
@@ -146,40 +187,18 @@ public class Tray {
 		return true;
 	}
 	
-	// Potentially faster equals method
-	// Work in progress
-	public boolean equals2(Tray compare){
-		if(this.tray.length != compare.tray.length){
-			return false;
-		}
-		if(this.tray[0].length != compare.tray[0].length){
-			return false;
-		}
-		for(int x = 0; x < tray.length; x++){
-			while(true){
-				
-			}
-		}
-		return false;
-	}
-	
-
 	public Tray clone(){
-		Tray clone = new Tray(this.trayHeight, this.trayWidth);
+		Tray clone = new Tray(this.height, this.width);
 		clone.blocks.putAll(blocks);
 		clone.tray = tray.clone();
 		return clone;
 	}
 	
 	public void convertToGoalTray(){
-		for(int i = 0; i < tray.length; i++){
-			for(int j = 0; j < tray[i].length; j++){
-				if(tray[i][j]==0){
-					tray[i][j] = -1; 
-				}
-			}
-		}	
-	
+		for(int i = 0; i < tray.length; i++)
+			for(int j = 0; j < tray[i].length; j++)
+				if(tray[i][j]==0)
+					tray[i][j] = -1;
 	}
 	
 

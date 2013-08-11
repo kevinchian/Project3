@@ -77,4 +77,14 @@ public class Block {
 	public int hashCode() {
 		return top*256*256*256 + bottom*256*256 + left*256 + right;
 	}
+	public Block move(char direction) {
+		Block b = this.clone();
+		switch(direction) {
+			case 'u': b.top--; b.bottom--; break;
+			case 'd': b.top++; b.bottom++; break;
+			case 'l': b.left--; b.right--; break;
+			case 'r': b.left++; b.right++; break;
+		}
+		return b;
+	}
 }
