@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 public class TrayTest extends TestCase {
-	
+/*	
 	String[] input = {"easy/140x140", "easy/1x2.two.blocks", "easy/big.block.1", "easy/big.search.1", "easy/big.tray.2", 
 			"easy/enormous.full.1", "easy/tree+270", "medium/big.tray.4", "medium/blockado", "medium/dads", 
 			"medium/c18", "hard/big.tray.1",  "hard/big.tray.3", "hard/big.tray.4", "hard/blockado", "hard/century+180",
@@ -90,5 +90,53 @@ public class TrayTest extends TestCase {
 		    long time = System.currentTimeMillis() - start;
 		    System.out.println("Check if done for " + input[i] + ": " + time + "ms");
 		}
+	}
+
+	*/
+	public void testEquals(){	
+		Tray t1 = new Tray(4, 5);
+		Tray t2 = new Tray(3, 5);
+		Tray t3 = new Tray(4, 5);
+		Block b = new Block(0,0, 2, 2);
+		t1.add(b);
+		t3.add(b);
+		
+		System.out.print(t1.toString());
+		System.out.print(t3.toString());
+		
+		assertFalse(t1.equals(t2)); //different size of tray.
+		assertTrue(t1.equals(t3)); //same tray but keep getting error from block equals method.
+	}
+	
+	public void testclone(){
+		Tray t1 = new Tray(4, 5);
+		assertTrue(t1.equals(t1.clone()));
+	}
+	
+	public void testisOK(){
+		Tray t1 = new Tray(4,5);
+		Block b1 = new Block(0,0,1,2); //is Not Ok
+		Block b2 = new Block(0,1,1,5);
+		try{
+		t1.isOK();
+		fail();
+		}catch(IllegalStateException e){
+			assertTrue(true);
+		}
+	
+		
+		Tray t2 = new Tray(4,5);
+		Block b3 = new Block(0,0,1,2); //is Ok
+		Block b4 = new Block(3,3,4,4); // again equal method is not working.
+		try{
+			t2.isOK();
+			assertTrue(true);
+		}catch(IllegalStateException e){
+			fail();
+		}
+		
+		
+		
+		
 	}
 }

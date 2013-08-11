@@ -109,6 +109,29 @@ public class BlockTest extends TestCase{
 		Block d = new Block(121, 182, 200, 122); //they are intersected some part.
 		assertTrue(b.intersects(d));
 	}
+
+	public void testMove(){
+		Block b = new Block(123,182,200,122);
+		System.out.println(b.toString());
+		Block bu = new Block(122, 182, 199, 122); //up
+		assertTrue(b.move('u').equals(bu));
+
+		Block bd = new Block(124, 182, 201, 122); //left
+		assertTrue(b.move('d').equals(bd));
+	
+
+		Block bl = new Block(123, 181, 200, 121); //right
+		assertTrue(b.move('l').equals(bl));
+		
+		Block br = new Block(123, 183, 200, 123); //left
+		assertTrue(b.move('r').equals(br));
+		
+		
+	}
+
 }
+
+
+
 
 
