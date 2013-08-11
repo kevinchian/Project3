@@ -85,9 +85,22 @@ public class Tray {
 		
 	}
 	
+	
 	public String toString(){
 		// josh
-		return "";
+		String rtn = "";
+		
+		while(blocks.iterator().hasNext()){
+			rtn+= "BlockID: " + blocks.iterator().next() + " ";
+		}
+		for(int i = 0; i < tray.length; i++){
+			for(int j = 0; j < tray[i].length; j++){
+				System.out.print(tray[i][j] + " ");
+			}
+			System.out.println("");
+		}	
+		
+		return rtn;
 	}
 	
 	// Iterates through the tray to see if the equals are the same.
