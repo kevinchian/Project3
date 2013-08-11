@@ -82,6 +82,7 @@ public class BlockTest extends TestCase{
 	    }
 	}
 	
+	// Tests for itersecting blocks to return false.
 	public void testIntersect(){
 		
 	}
