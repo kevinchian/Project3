@@ -82,9 +82,32 @@ public class BlockTest extends TestCase{
 	    }
 	}
 	
+	
+	public void testEquals(){
+		Block b = new Block(123,182,200,122); // random block
+		Block c = new Block(123,182,200,122);
+		Block d = new Block(123,182,200,123);
+		assertTrue(b.equals(c));
+		assertFalse(b.equals(d));
+	}
+	
+	public void testClone(){
+		Block b = new Block(123,182,200,122); // random block
+		Block bclone = b.clone();
+		assertTrue(b.equals(bclone));
+	}
+	
 	// Tests for itersecting blocks to return false.
 	public void testIntersect(){
+		Block b = new Block(123,182,200,122); // random block
+		Block bclone = b.clone(); //same block as b.
+		assertTrue(b.intersects(bclone)); //same blocks are intersected.
+
+		Block c = new Block(1, 1, 4, 4); //they are not intersected at all.
+		assertFalse(b.intersects(c));
 		
+		Block d = new Block(121, 182, 200, 122); //they are intersected some part.
+		assertTrue(b.intersects(d));
 	}
 }
 
