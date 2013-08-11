@@ -1,6 +1,8 @@
 import java.awt.Point;
 
 public class Block {
+	
+	// Represented a block as a coordinate system, instead of index cell system.
 
 	private static int idCounter = 1;
 	

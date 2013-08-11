@@ -1,3 +1,4 @@
+import java.awt.Point;
 import java.util.*;
 
 public class Tray {
@@ -8,6 +9,7 @@ public class Tray {
 	private int trayWidth;
 	private int[][] tray;
 	private HashMap<Integer, Block> blocks;
+	private ArrayList<Point> emptySpace; // maybe we need this to keep track of empty space? tbd.
 	
 	public Tray(int trayHeight, int trayWidth){
 		this.trayHeight = trayHeight;
@@ -16,11 +18,12 @@ public class Tray {
 		blocks = new HashMap<Integer, Block>();
 	}
 	
+	// Sometimes the goal file can have out of bounds goals. We need to catch these in the Solver class and say no solution
 	public void add(Block b){
-		blocks.put(b.id(), b);
 		for(int i=b.top(); i<b.bottom(); i++)
-			for(int j=b.top(); j<b.bottom(); j++)
+			for(int j=b.left(); j<b.right(); j++)
 				tray[i][j] = b.id();
+		blocks.put(b.id(), b);
 	}
 	
 	public void isOK(){
@@ -35,7 +38,7 @@ public class Tray {
 		if (!comparision.equals(tray))
 			throw new IllegalStateException("inconsistency between blocks and tray");
 		/* todos:
-		 * 1. update block tests to reflect the new block class
+		 * 1. update block tests to reflect the new block class (done)
 		 * make sure to test block.intersect(b) thoroughly
 		 * 2. write a tray.clone() method for tray
 		 * 3. write 2 different version of tray.moves(), one that finds
@@ -78,7 +81,8 @@ public class Tray {
 	 */
 	
 	public ArrayList<Tray> moves(){
-		return null;
+		Tray copy = this.clone();
+		
 	}
 	
 	
@@ -91,20 +95,24 @@ public class Tray {
 		for(int i = 0; i < tray.length; i++){
 			for(int j = 0; j < tray[i].length; j++){
 				if(tray[i][j]==-1){
-					rtn+="|*|";
+						rtn+="|*|";
 				}
-				if(tray[i][j]==0){
+				
+				else if(tray[i][j]==0){
 					rtn+="|0|";
 				}
+				
 				else{
 					if(j==0 && j+1<tray[i].length && tray[i][j+1]>0) //first x and next is x
-						rtn+="|2 ";
+						rtn+="|"+ tray[i][j]+" ";
+					else if(j!=0 && j+1<tray[i].length && tray[i][j+1]>0 && tray[i][j-1]>0)
+						rtn+=" "+ tray[i][j]+" ";
 					else if(j!=0 && j+1<tray[i].length && tray[i][j+1]>0) //next is x
-						rtn+="|2 ";
+						rtn+="|"+ tray[i][j]+" ";
 					else if(j!=0 && j+1<tray[i].length && tray[i][j-1]>0) //prev is x
-						rtn+=" 2|";
+						rtn+=" "+tray[i][j]+"|";
 					else
-						rtn+="|2|";
+						rtn+="|"+tray[i][j]+"|";
 						
 				}
 			}
@@ -146,6 +154,7 @@ public class Tray {
 	}
 	
 	// Potentially faster equals method
+	// Work in progress
 	public boolean equals2(Tray compare){
 		if(this.tray.length != compare.tray.length){
 			return false;
@@ -161,19 +170,43 @@ public class Tray {
 		return false;
 	}
 	
+
+	public Tray clone(){
+		Tray clone = new Tray(this.trayHeight, this.trayWidth);
+		clone.blocks.putAll(blocks);
+		clone.tray = tray.clone();
+		return clone;
+	}
 	
+	public void convertToGoalTray(){
+		for(int i = 0; i < tray.length; i++){
+			for(int j = 0; j < tray[i].length; j++){
+				if(tray[i][j]==0){
+					tray[i][j] = -1; 
+				}
+			}
+		}	
+	
+	}
+	
+
 	public static void main(String args[]){
 		Tray t = new Tray(5, 5);
-		Block b1 = new Block(0, 0, 2, 3);
+		Block b1 = new Block(2, 2, 4, 4);
 		System.out.print(b1.toString());
-		Block b2 = new Block(2, 2, 4, 4);
+		Block b2 = new Block(0, 0, 2, 3);
 		System.out.print(b2.toString());
 		System.out.print("\n");
+		
 		t.add(b1);
 		t.add(b2);
 		System.out.print(t.toString());
+		System.out.println();
+		t.convertToGoalTray();
+		System.out.print(t.toString());
 	
 	}
+	
 	
 	
 	
