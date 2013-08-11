@@ -3,6 +3,7 @@ import java.awt.Point;
 public class Block {
 	
 	// Represented a block as a coordinate system, instead of index cell system.
+	// Need to git push again to update... 
 
 	private static int idCounter = 1;
 	
