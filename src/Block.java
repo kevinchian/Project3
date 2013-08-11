@@ -64,9 +64,16 @@ public class Block {
 	public String toString(){
 		return "Block<("+width()+"x"+height()+")@["+top+","+left+"]>";
 	}
-	public boolean intersects(Block b){
+	public boolean intersects(Block b) {
 		boolean colX = left < b.right && b.left < right;
 		boolean rowX = top < b.bottom && b.top < bottom;
 		return colX && rowX;
+	}
+	public boolean equals(Block b) {
+		return top == b.top && bottom == b.bottom &&
+				left == b.left && right == b.right;
+	}
+	public int hashCode() {
+		return top*256*256*256 + bottom*256*256 + left*256 + right;
 	}
 }

@@ -5,15 +5,15 @@ public class Tray {
 
 	private static boolean iAmDebugging = true;
 	
-	private int trayHeight;
-	private int trayWidth;
+	private int height;
+	private int width;
 	private int[][] tray;
 	private HashMap<Integer, Block> blocks;
 	private ArrayList<Point> emptySpace; // maybe we need this to keep track of empty space? tbd.
 	
 	public Tray(int trayHeight, int trayWidth){
-		this.trayHeight = trayHeight;
-		this.trayWidth = trayWidth;
+		this.height = trayHeight;
+		this.width = trayWidth;
 		tray = new int[trayHeight][trayWidth];
 		blocks = new HashMap<Integer, Block>();
 	}
@@ -27,7 +27,7 @@ public class Tray {
 	}
 	
 	public void isOK(){
-		int[][] comparision = new int[trayHeight][trayWidth];
+		int[][] comparision = new int[height][width];
 		for (Block b: blocks.values())
 			for (int i=b.top();i<b.bottom();i++)
 				for (int j=b.left();i<b.right();j++) {
@@ -82,7 +82,7 @@ public class Tray {
 	
 	public ArrayList<Tray> moves(){
 		Tray copy = this.clone();
-		
+		return null;
 	}
 	
 	
@@ -104,30 +104,23 @@ public class Tray {
 	}
 	
 	// Iterates through the tray to see if the equals are the same.
-	public boolean equals(Tray compare){
-		if(this.tray.length != compare.tray.length){
+	public boolean equals(Tray t){
+		if(t.width != width || t.height != height)
 			return false;
-		}
-		if(this.tray[0].length != compare.tray[0].length){
-			return false;
-		}
-		for(int x = 0; x < tray.length; x++){
-			for(int y = 0; y<tray[x].length; y++){
-				int thisID = this.tray[x][y];
-				int otherID = compare.tray[x][y];
-				if(otherID == -1 || thisID == -1){ 
-					//skip to next iteration: wild card
-				}
-				else if(thisID == 0 && otherID != 0 || otherID == 0 && thisID != 0){
+		for(int i=0; i<height; i++){
+			for(int j=0; j<width; j++){
+				int thisID = tray[i][j];
+				int otherID = t.tray[i][j];
+				if(otherID == -1 || thisID == -1) 
+					continue;
+				else if (thisID == 0 && otherID != 0 || 
+						otherID == 0 && thisID != 0)
 					return false;
-				}
 				else{
 					Block b1 = blocks.get(thisID);
-					Block b2 = compare.blocks.get(otherID);
-					if(b1.top() != b2.top() || b1.bottom() != b2.bottom() || b1.left() != b2.left() 
-							|| b1.right() != b2.right()){ // Maybe write a block equals method testing its coordinates but not hashcode.
+					Block b2 = t.blocks.get(otherID);
+					if (!b1.equals(b2))
 						return false;
-					}
 				}
 			}
 		}
