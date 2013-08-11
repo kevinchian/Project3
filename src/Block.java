@@ -3,6 +3,7 @@ import java.awt.Point;
 public class Block {
 	
 	// Represented a block as a coordinate system, instead of index cell system.
+	// Need to git push again to update... 
 
 	private static int idCounter = 1;
 	
@@ -62,7 +63,7 @@ public class Block {
 		return new Block(top, left, bottom, right);
 	}
 	public String toString(){
-		return "Block<("+width()+"x"+height()+")@["+top+","+left+"]>";
+		return "Block<("+height()+"x"+width()+")@["+top+","+left+"]>";
 	}
 	public boolean intersects(Block b) {
 		boolean colX = left < b.right && b.left < right;

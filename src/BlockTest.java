@@ -20,14 +20,14 @@ public class BlockTest extends TestCase{
 	
 	public void testOne() {
 		
-		Block b1 = new Block(0,0,0,0); // 1x1 block
+		Block b1 = new Block(0,0,1,1); // 1x1 block
 		System.out.println(b1.height());
 		assertTrue(b1.height()==1);
 		assertFalse(b1.width() == 3);
 		assertEquals(b1.toString(),"Block<(1x1)@[0,0]>");
 		
 		
-		Block b2 = new Block(1,1,2,2); // 2x2 block
+		Block b2 = new Block(1,1,3,3); // 2x2 block
 		System.out.println(b2.height());
 		assertFalse(b2.height()==5);
 		assertTrue(b2.width()==2);
@@ -36,9 +36,9 @@ public class BlockTest extends TestCase{
 		
 		Block b3 = new Block(123,122,200,182); // random block
 		System.out.println(b3.height());
-		assertTrue(b3.height() == 78);
-		assertTrue(b3.width() == 61);
-		assertEquals(b3.toString(),"Block<(78x61)@[123,122]>");
+		assertFalse(b3.height() == 78);
+		assertTrue(b3.width() == 60);
+		assertEquals(b3.toString(),"Block<(77x60)@[123,122]>");
 		
 		/*
 		Block b3 = new Block(0,0,0,0); // invalid block;
@@ -77,11 +77,12 @@ public class BlockTest extends TestCase{
 	    	int y1 = Integer.parseInt(coords[1]);
 	    	int x2 = Integer.parseInt(coords[2]);
 	    	int y2 = Integer.parseInt(coords[3]);
-	    	Block b = new Block(x1, y1, x2, y2);
+	    	Block b = new Block(x1, y1, x2+1, y2+1);
 	    	System.out.println(b);
 	    }
 	}
 	
+	// Tests for itersecting blocks to return false.
 	public void testIntersect(){
 		
 	}
