@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 
 
@@ -5,6 +6,8 @@ public class Solver {
 	
 	private static boolean iAmDebugging = true;
 	private HashSet<Tray> previousStates;
+	private ArrayList<Tray> path;
+	
 
 	// Create a graph structure with nodes representing 1 move board states. 
 	// Depth First search

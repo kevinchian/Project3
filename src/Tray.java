@@ -134,7 +134,7 @@ public class Tray {
 		Block b = blocks.get(tray[i][j]); 
 		Tray t = this.clone();
 		t.remove(b);
-		t.add(b.moves(d));
+		t.add(b.move(d));
 		return t;
 	}
 	

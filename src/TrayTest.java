@@ -1,12 +1,12 @@
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import junit.framework.TestCase; 
 import org.junit.Test;
 
 public class TrayTest extends TestCase {
-/*	
 	String[] input = {"easy/140x140", "easy/1x2.two.blocks", "easy/big.block.1", "easy/big.search.1", "easy/big.tray.2", 
 			"easy/enormous.full.1", "easy/tree+270", "medium/big.tray.4", "medium/blockado", "medium/dads", 
 			"medium/c18", "hard/big.tray.1",  "hard/big.tray.3", "hard/big.tray.4", "hard/blockado", "hard/century+180",
@@ -34,8 +34,11 @@ public class TrayTest extends TestCase {
             int goalY1 = Integer.parseInt(goalLocation[1]);
             int goalX2 = Integer.parseInt(goalLocation[2]);
             int goalY2 = Integer.parseInt(goalLocation[3]); 
-            Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
-            board.addGoals(goal);
+            try{
+            Block goal = new Block(goalX1, goalY1, goalX2 + 1, goalY2 + 1);
+            } catch (IllegalArgumentException e){
+            	
+            }
         }
         while (true) {
             // Read a line from the input file.
@@ -48,7 +51,7 @@ public class TrayTest extends TestCase {
             int y1 = Integer.parseInt(arr[1]);
             int x2 = Integer.parseInt(arr[2]);
             int y2 = Integer.parseInt(arr[3]);
-            Block b = new Block(x1, y1, x2, y2);
+            Block b = new Block(x1, y1, x2 +1, y2 + 1);
             board.add(b);
         }
         return board;
@@ -73,7 +76,7 @@ public class TrayTest extends TestCase {
 		    InputSource goalInput = new InputSource("tests/"+output[i]);
 		    Tray test = initialize(initialBoardState, goalInput);
 		    long start = System.currentTimeMillis();
-		    ArrayList<Tray> possibleMoves = test.moves();
+		    HashSet<Tray> possibleMoves = test.moves();
 		    long time = System.currentTimeMillis() - start;
 		    System.out.println("Find moves for " + input[i] + ": " + time + "ms");
 		}
@@ -86,13 +89,12 @@ public class TrayTest extends TestCase {
 		    InputSource goalInput = new InputSource("tests/"+output[i]);
 		    Tray test = initialize(initialBoardState, goalInput);
 		    long start = System.currentTimeMillis();
-		    boolean done = test.finished();
+//		    boolean done = test.finished(); 
 		    long time = System.currentTimeMillis() - start;
 		    System.out.println("Check if done for " + input[i] + ": " + time + "ms");
 		}
 	}
 
-	*/
 	public void testEquals(){	
 		Tray t1 = new Tray(4, 5);
 		Tray t2 = new Tray(3, 5);
