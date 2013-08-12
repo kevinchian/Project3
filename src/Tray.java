@@ -39,14 +39,16 @@ public class Tray {
 				tray[i][j] = 0;
 	}
 	
-	public void isOK(){
+	public void isOK(){ // need to fix it.
 		int[][] comparision = new int[height][width];
+		Tray comp = new Tray(height, width);
 		for (Block b: blocks.values())
 			for (int i=b.top();i<b.bottom();i++)
 				for (int j=b.left();i<b.right();j++) {
 					if (comparision[i][j] != 0)
 						throw new IllegalStateException("conflicting block positions");
 					else comparision[i][j] = b.id();
+					
 				}
 		if (!comparision.equals(tray))
 			throw new IllegalStateException("inconsistency between blocks and tray");
@@ -176,12 +178,14 @@ public class Tray {
 				else if (thisID == 0 && otherID != 0 || 
 						otherID == 0 && thisID != 0)
 					return false;
-				else{
+				/*
+				else{               //Do we need this part??
 					Block b1 = blocks.get(thisID);
 					Block b2 = t.blocks.get(otherID);
 					if (!b1.equals(b2))
 						return false;
 				}
+				*/
 			}
 		}
 		return true;
