@@ -174,18 +174,18 @@ public class Tray {
 				int thisID = tray[i][j];
 				int otherID = t.tray[i][j];
 				if(otherID == -1 || thisID == -1) 
-					continue;
+					break;
 				else if (thisID == 0 && otherID != 0 || 
 						otherID == 0 && thisID != 0)
 					return false;
-				/*
-				else{               //Do we need this part??
+				else if (thisID == 0 && otherID == 0)
+					break;
+				else{              
 					Block b1 = blocks.get(thisID);
 					Block b2 = t.blocks.get(otherID);
 					if (!b1.equals(b2))
 						return false;
 				}
-				*/
 			}
 		}
 		return true;

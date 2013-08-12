@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 
 public class Solver {
@@ -7,13 +6,18 @@ public class Solver {
 	private static boolean iAmDebugging = true;
 	private HashSet<Tray> previousStates;
 	private ArrayList<Tray> path;
-	
+	private PriorityQueue<Tray> traysToExplore;
+	private Tray goal;
 
 	// Create a graph structure with nodes representing 1 move board states. 
 	// Depth First search
 	// Check HashCode by Saturday
-	public Solver(Tray board){
+	public Solver(Tray board, Tray end){
 		previousStates = new HashSet<Tray>();
+		traysToExplore = new PriorityQueue<Tray>();
+		path = new ArrayList<Tray>();
+		goal = end;
+		path.add(board);
 	}
 	
 	// Continue solving
@@ -21,12 +25,21 @@ public class Solver {
 	// heuristic function
 	// breadth first search
 	public void solve(){
-		
+		Tray current = path.get(path.size() - 1);
+		HashSet<Tray> moves = current.moves();
+		for(Tray t : moves){
+			if(t.equals(goal)){
+				path.add(t);
+				return;
+			}
+			
+		}
 	}
 	
 	public static void main(String[] args){
 		
 	   Tray board;
+	   Tray goal;
 	   if (args.length == 3){
 		   // -o options. Implement later
 		   // -otime, -oinfo, -odebug, 
@@ -40,7 +53,7 @@ public class Solver {
             int height = Integer.parseInt(boardDimension[0]);
             int width = Integer.parseInt(boardDimension[1]);
             board = new Tray(height, width);
-            
+            goal = new Tray(height, width);
             while(true){
             	String goalString = goalInput.readLine();
             	if(goalString == null){
@@ -51,8 +64,8 @@ public class Solver {
                 int goalY1 = Integer.parseInt(goalLocation[1]);
                 int goalX2 = Integer.parseInt(goalLocation[2]);
                 int goalY2 = Integer.parseInt(goalLocation[3]); 
-                Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
-                board.addGoals(goal);
+                Block b = new Block(goalX1, goalY1, goalX2, goalY2);
+                goal.add(b);
             }
             while (true) {
                 // Read a line from the input file.
@@ -76,6 +89,10 @@ public class Solver {
 	   else{
 		   throw new IllegalArgumentException("Illegal amount of arguments: " + args.length);
 	   } 
+	   goal.convertToGoalTray();
+	   Solver s = new Solver(board, goal);
+	   s.solve();
+	   System.out.println(s);
 	}
 }
 	   
