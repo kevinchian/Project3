@@ -1,90 +1,72 @@
-import java.awt.Point;
-
 public class Block {
-	
-	// Represented a block as a coordinate system, instead of index cell system.
-	// Need to git push again to update... 
+		private int top, bottom, left, right;
+		private int id;
 
-	private static int idCounter = 1;
-	
-	private int id;
-	private int top;
-	private int bottom;
-	private int left;
-	private int right;
-	
-	public Block(int i, int j, int i2, int j2){
-		if (i == i2) {
-			throw new IllegalArgumentException("Block size is invalid");
-		} else if (i > i2) {
-			bottom = i;
-			top = i2;
-		} else {
-			bottom = i2;
-			top = i;
+		//Block class constructor
+		public Block(int x1, int y1, int x2, int y2) {
+			this.top = x1;
+			this.bottom = x2;
+			this.left = y1;
+			this.right = y2;
+			this.id = 0;
 		}
-		if (j == j2) {
-			throw new IllegalArgumentException("Block size is invalid");
-		} else if (j > j2) {
-			right = j;
-			left = j2;
-		} else {
-			right = j2;
-			left = j;
+		
+		public void setID(int i){
+			id = i;
 		}
-		this.id = idCounter;
-		idCounter++;
-	}
-	
-	public int id() {
-		return id;
-	}
-	public int top() {
-		return top;
-	}
-	public int bottom() {
-		return bottom;
-	}
-	public int left() {
-		return left;
-	}
-	public int right() {
-		return right;
-	}
-	
-	public int height(){
-		return bottom - top;
-	}
-	
-	public int width(){
-		return right - left;
-	}
-	public Block clone(){
-		return new Block(top, left, bottom, right);
-	}
-	public String toString(){
-		return "Block<("+height()+"x"+width()+")@["+top+","+left+"]>";
-	}
-	public boolean intersects(Block b) {
-		boolean colX = left < b.right && b.left < right;
-		boolean rowX = top < b.bottom && b.top < bottom;
-		return colX && rowX;
-	}
-	public boolean equals(Block b) {
-		return top == b.top && bottom == b.bottom &&
-				left == b.left && right == b.right;
-	}
-	public int hashCode() {
-		return top*256*256*256 + bottom*256*256 + left*256 + right;
-	}
-	public Block move(char direction) {
-		Block b = this.clone();
-		switch(direction) {
-			case 'u': b.top--; b.bottom--; break;
-			case 'd': b.top++; b.bottom++; break;
-			case 'l': b.left--; b.right--; break;
-			case 'r': b.left++; b.right++; break;
+
+		public String toString(){
+			return "Block<("+height()+"x"+width()+")@["+top+","+left+"]>";
 		}
-		return b;
-	}
+
+		public int height() {
+			return bottom - top + 1;
+		}
+
+		public int width() {
+			return right - left + 1;
+		}
+		
+		public int id() {
+			return id;
+		}
+		public int top() {
+			return top;
+		}
+		public int bottom() {
+			return bottom;
+		}
+		public int left() {
+			return left;
+		}
+		public int right() {
+			return right;
+		}
+	
+		public Block clone(){
+			Block b = new Block(top, left, bottom, right);
+			b.setID(this.id());
+			return b;
+		}
+
+		public boolean equals(Object ref) {
+			Block other = (Block) ref;
+			return other.top == top && other.bottom == bottom
+					&& other.left == left && other.right == right;
+		}
+		
+		public int hashCode() {
+			return top*256*256*256 + bottom*256*256 + left*256 + right;
+		}
+		
+		public Block move(char direction) {
+			Block b = this.clone();
+			switch(direction) {
+				case 'u': b.top--; b.bottom--; break;
+				case 'd': b.top++; b.bottom++; break;
+				case 'l': b.left--; b.right--; break;
+				case 'r': b.left++; b.right++; break;
+			}
+			return b;
+		}
 }

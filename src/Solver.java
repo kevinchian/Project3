@@ -1,24 +1,21 @@
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.PriorityQueue;
+import java.util.*;
 
 
 public class Solver {
 	
 	private static boolean iAmDebugging = false;
 	private HashSet<Tray> previousStates;
-	private ArrayList<Tray> path;
-	private PriorityQueue<Tray> fringe;
+	private ArrayList<String> path;
+	private Stack<Tray> fringe;
 	private Tray init;
 	private Tray goal;
 
 	public Solver(Tray init, Tray goal){
 		this.goal = goal;
 		this.init = init;
-		path = new ArrayList<Tray>();
-		path.add(init);
-		fringe = new PriorityQueue<Tray>();
-		fringe.add(init);
+		path = new ArrayList<String>();
+		fringe = new Stack<Tray>();
+		fringe.push(init);
 		previousStates = new HashSet<Tray>();
 		previousStates.add(init);
 		this.solve(init);
@@ -27,31 +24,39 @@ public class Solver {
 	public void solve(Tray currBoard){
 		while(!fringe.isEmpty()){
 			previousStates.add(currBoard);
-			path.add(currBoard);
+			if(currBoard.move() != null){
+				path.add(currBoard.move());
+			}
 			if(currBoard.equals(goal)){
-				return;
+				System.out.println(this);
+				System.exit(0);
 			}
 			HashSet<Tray> moves = currBoard.moves();
 			int addCounter = 0;
 			for(Tray t : moves){
+				System.out.println("Tray possible moves: /n" +t);
+		
 				if(previousStates.contains(t)){
-					break;
 				}
-				fringe.add(t);
-				addCounter++;
+				else{
+					fringe.push(t);
+					addCounter++;
+				}
 			}
 			if(addCounter == 0){
-				path.remove(currBoard);
+				path.remove(path.size() -1);
 			}
-			solve(fringe.poll());
-		return;
+			Tray t = fringe.pop();
+			solve(t);		
 	}
+	System.exit(1);
+	return;
 }
 
 	public String toString(){
-		String s = "";
-		for(Tray t : path){
-			s += t.toString() + "\n";
+		String s = "Solution: \n";
+		for(String t : path){
+			s += t + "\n";
 		}
 		return s;
 	}
@@ -110,7 +115,7 @@ public class Solver {
 			   throw new IllegalArgumentException("Illegal amount of arguments: " + args.length);
 		   } 
 		   goal.convertToGoalTray();
+		   System.out.println("Goal: " + goal);
 		   Solver s = new Solver(board, goal);
-		   System.out.println(s);
 		}
 }

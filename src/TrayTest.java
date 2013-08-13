@@ -35,7 +35,7 @@ public class TrayTest extends TestCase {
             int goalX2 = Integer.parseInt(goalLocation[2]);
             int goalY2 = Integer.parseInt(goalLocation[3]); 
             try{
-            Block goal = new Block(goalX1, goalY1, goalX2 + 1, goalY2 + 1);
+            Block goal = new Block(goalX1, goalY1, goalX2, goalY2);
             } catch (IllegalArgumentException e){
             	
             }
@@ -51,10 +51,26 @@ public class TrayTest extends TestCase {
             int y1 = Integer.parseInt(arr[1]);
             int x2 = Integer.parseInt(arr[2]);
             int y2 = Integer.parseInt(arr[3]);
-            Block b = new Block(x1, y1, x2 +1, y2 + 1);
+            Block b = new Block(x1, y1, x2, y2);
             board.add(b);
         }
         return board;
+	}
+	
+	@Test
+	public void testEquals(){	
+		Tray t1 = new Tray(4, 5);
+		Tray t2 = new Tray(3, 5);
+		Tray t3 = new Tray(4, 5);
+		Block b = new Block(0,0, 2, 2);
+		t1.add(b);
+		t3.add(b);
+		
+		System.out.print(t1.toString());
+		System.out.print(t3.toString());
+		
+		assertFalse(t1.equals(t2)); //different size of tray.
+		assertTrue(t1.equals(t3)); //same tray but keep getting error from block equals method.
 	}
 	
 	@Test
@@ -82,44 +98,64 @@ public class TrayTest extends TestCase {
 		}
 	}
 	
-	@Test
-	public void testTimeFinished(){
-		for(int i = 0; i < input.length; i++){
-			InputSource initialBoardState = new InputSource ("tests/"+input[i]);
-		    InputSource goalInput = new InputSource("tests/"+output[i]);
-		    Tray test = initialize(initialBoardState, goalInput);
-		    long start = System.currentTimeMillis();
+//	@Test
+//	public void testTimeFinished(){
+//		for(int i = 0; i < input.length; i++){
+//			InputSource initialBoardState = new InputSource ("tests/"+input[i]);
+//		    InputSource goalInput = new InputSource("tests/"+output[i]);
+//		    Tray test = initialize(initialBoardState, goalInput);
+//		    long start = System.currentTimeMillis();
 //		    boolean done = test.finished(); 
-		    long time = System.currentTimeMillis() - start;
-		    System.out.println("Check if done for " + input[i] + ": " + time + "ms");
-		}
-	}
+//		    long time = System.currentTimeMillis() - start;
+//		    System.out.println("Check if done for " + input[i] + ": " + time + "ms");
+//		}
+//	}
 
-	public void testEquals(){	
-		Tray t1 = new Tray(4, 5);
-		Tray t2 = new Tray(3, 5);
-		Tray t3 = new Tray(4, 5);
-		Block b = new Block(0,0, 2, 2);
-		t1.add(b);
-		t3.add(b);
-		
-		System.out.print(t1.toString());
-		System.out.print(t3.toString());
-		
-		assertFalse(t1.equals(t2)); //different size of tray.
-		assertTrue(t1.equals(t3)); //same tray but keep getting error from block equals method.
-	}
 	
 	public void testclone(){
 		Tray t1 = new Tray(4, 5);
-		assertTrue(t1.equals(t1.clone()));
+		Block b1 = new Block(0,0,0,0);
+		Block b2 = new Block(0,1,1,1);
+		t1.add(b1);
+		t1.add(b2);
+		Tray t2 = t1.clone();
+		assertTrue(t1.equals(t2));
+		System.out.println("original: \n" + t1);
+		System.out.println("clone: \n" + t2);
+	}
+	
+	public void testHashCode(){
+		Tray t1 = new Tray(4, 5);
+		Tray t2 = new Tray(4, 5);
+		long start = System.currentTimeMillis();
+		assertEquals(t1.hashCode(), t2.hashCode());
+		long time = System.currentTimeMillis() - start;
+		System.out.println("Tray 1 Hashcode: " + t1.hashCode());
+		System.out.println("Tray 2 Hashcode: " + t2.hashCode());
+		System.out.println("Hashcode for empty tray: " + time);
+		Block b1 = new Block(0,0,0,0);
+		Block b2 = new Block(0,1,1,1);
+		t1.add(b1);
+		t1.add(b2);
+		t2.add(b1);
+		t2.add(b2);
+		start = System.currentTimeMillis();
+		assertEquals(t1.hashCode(), t2.hashCode());
+		time = System.currentTimeMillis() - start;
+		System.out.println("Tray 1 Hashcode: " + t1.hashCode());
+		System.out.println("Tray 2 Hashcode: " + t2.hashCode());
+		System.out.println("Hashcode for filled tray: " + time);
 	}
 	
 	public void testisOK(){
 		Tray t1 = new Tray(4,5);
 		Block b1 = new Block(0,0,1,2); //is Not Ok
 		Block b2 = new Block(0,1,1,5);
+		t1.add(b1);
+		t1.add(b2);
 		try{
+		t1.add(b1);
+		t1.add(b2);
 		t1.isOK();
 		fail();
 		}catch(IllegalStateException e){
@@ -131,14 +167,13 @@ public class TrayTest extends TestCase {
 		Block b3 = new Block(0,0,1,2); //is Ok
 		Block b4 = new Block(3,3,4,4); // again equal method is not working.
 		try{
+			t2.add(b3);
+			t2.add(b4);
 			t2.isOK();
 			assertTrue(true);
 		}catch(IllegalStateException e){
 			fail();
-		}
-		
-		
-		
+		}		
 		
 	}
 }
