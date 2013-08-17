@@ -42,7 +42,7 @@ public class Solver {
 		log("winner!");
 		for (String s: node.getMoves())
 			System.out.println(s);
-		System.exit(1);
+		System.exit(0);
 	}
 
 	public static void setParams(String option) {
@@ -123,7 +123,6 @@ public class Solver {
 			setParams(args[0]);
 			solveProblem(args[1], args[2]);
 		} else {
-			System.out.println("invalid args");
 			System.exit(1);
 		}
 		
