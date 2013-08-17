@@ -2,16 +2,25 @@ import java.util.*;
 
 public class Tray implements Comparable<Tray>{
 
+	// dimensions of the tray
 	private int height;
 	private int width;
+	// redundant representations of blocks, each for a specific enhancement
 	private int[][] tray;
 	private HashMap<Integer, Block> blocks;
+	// the moves it took to get to this tray
 	private Stack<String> moves;
+	// goal tray to compare to. set externally in solver.java
 	public static Tray goal;
-	// a double [0,1] that determines how close you are to goal state. lower is better
+	// unmemoized initial values, see description in the functions that set them
 	private double myHeuristic = 2;
 	private int hash = 0;
 	
+	/**
+	 * creates a tray of specified dimensions
+	 * @param trayHeight height of tray
+	 * @param trayWidth width of tray
+	 */
 	public Tray(int trayHeight, int trayWidth){
 		this.height = trayHeight;
 		this.width = trayWidth;
@@ -20,6 +29,11 @@ public class Tray implements Comparable<Tray>{
 		moves = new Stack<String>();			
 	}
 	
+	/**
+	 * checks that the internal states of the tray
+	 * are internally consistent. builds a new int[][]
+	 * from the blocks and compares it to tray
+	 */
 	public void isOK() {
 		int[][] comparison = new int[height][width];
 		for (Integer id: blocks.keySet()) {
@@ -39,6 +53,11 @@ public class Tray implements Comparable<Tray>{
 					throw new IllegalStateException("descrepency between tray and blocks");
 	}
 	
+	/**
+	 * adds a block to this tray and sets its id so that it has a unique
+	 * identifier in the 2d array. throws exception if cannot add block
+	 * @param b block to add
+	 */
 	private int idCounter = 1;
 	public void add(Block b){
 		b.id = idCounter;
@@ -53,6 +72,11 @@ public class Tray implements Comparable<Tray>{
 		isOK();
 	}
 	
+	/**
+	 * removes the tray from the list of trays and updates
+	 * tray and blocks accordingly 
+	 * @param b block to remove
+	 */
 	private void remove(Block b) {
 		this.blocks.remove(b.id());
 		for(int i=b.top(); i<=b.bottom(); i++)
@@ -61,6 +85,11 @@ public class Tray implements Comparable<Tray>{
 		isOK();
 	}
 	
+	/**
+	 * returns true if tray is equivalent to the comparison tray
+	 * does this by comparing the block equivalency instead of the id array
+	 * because each block might have a differnt id on the board
+	 */
 	public boolean equals(Object o){
 		return equals((Tray)o);
 	}
@@ -75,6 +104,11 @@ public class Tray implements Comparable<Tray>{
 		}
 		return true;
 	}
+	
+	/**
+	 * returns the hashcode associated with the tray by calculating it
+	 * from the 2d array of ids. equivalent trays should have the same hashcode
+	 */
 	public int hashCode() {
 		if (hash != 0) return hash;
 		HashMap<Integer, Integer> mapping = new HashMap<Integer, Integer>();
@@ -96,6 +130,9 @@ public class Tray implements Comparable<Tray>{
 		return hash;
 	}
 	
+	/**
+	 * creates a clone of the tray, does not clone internal blocks
+	 */
 	@SuppressWarnings("unchecked")
 	public Tray clone(){
 		Tray clone = new Tray(this.height, this.width);
@@ -109,6 +146,14 @@ public class Tray implements Comparable<Tray>{
 		return clone;
 	}
 	
+	/**
+	 * returns a number between 0 and 1 that measures how close the
+	 * tray is to the goal tray. 0 is a perfect match, 1 is impossible
+	 * to reach goal tray. lower numbers mean that you are closer to the
+	 * goal state. calculated by the manhattan distance between
+	 * goal blocks and self blocks.
+	 * @return heuristic
+	 */
 	public Double heuristic() {
 		if (myHeuristic <= 1) return myHeuristic;
 		if (goal.height != height || goal.width != width) {
@@ -137,6 +182,9 @@ public class Tray implements Comparable<Tray>{
 		return "Tray<("+height+"x"+width+") "+blocks.values().size()+" blocks>"; 
 	}
 	
+	/**
+	 * prints a grpahical representation of the board to stdout
+	 */
 	public void printBoard() {
 		String res = new String();
 		for (int i=0; i<height; i++) {
@@ -236,6 +284,13 @@ public class Tray implements Comparable<Tray>{
 		return t;
 	}
 
+	/**
+	 * returns the string associated with moving block in directino
+	 * i.e. "1 1 1 2" for moving block at 1,1 to 1,2
+	 * @param b block to move
+	 * @param d direction to move
+	 * @return string associate with movement
+	 */
 	private static String getMoveString(Block b, char d){
 		String res = b.top() + " " + b.left() + " ";
 		switch(d) {
@@ -247,6 +302,10 @@ public class Tray implements Comparable<Tray>{
 		return res;
 	}
 	
+	/**
+	 * return the list of moves (in string form)
+	 * @return
+	 */
 	public Stack<String> getMoves(){
 		return moves;
 	}

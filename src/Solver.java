@@ -3,13 +3,20 @@ import java.util.PriorityQueue;
 
 public class Solver {
 
+	// list of visited nodes
 	private HashSet<Tray> visited;
+	/// list of nodes yet to be explored
 	private PriorityQueue<Tray> fringe;
 
 	public static boolean debugging = false;
 	public static boolean printing = false;
 	public static boolean timing = false;
 
+	/**
+	 * creates a new solver class, but not solve the problem yet
+	 * @param init initial tray state
+	 * @param goal goal tray state
+	 */
 	public Solver(Tray init, Tray goal){
 		Tray.goal = goal;
 		visited = new HashSet<Tray>();
@@ -17,11 +24,20 @@ public class Solver {
 		fringe.add(init);
 	}
 
+	/**
+	 * print o.toString() if currently debugging
+	 * @param o the object to print
+	 */
 	public static void log(Object o) {
 		if (debugging)
 			System.out.println(o);
 	}
 
+	/**
+	 * runs dijkstra's algorithm with the the fringe this.fringe
+	 * and Tray.heuristic as the priority code
+	 * calls winner() when the goal state has been reached
+	 */
 	public void solve() {
 		while (!fringe.isEmpty()) {
 			log("fringe size: "+fringe.size());
@@ -41,12 +57,20 @@ public class Solver {
 		System.exit(1);
 	}
 
+	/**
+	 * called when the goal state has been reached, prints moves
+	 * @param node the winning tray, which contains the list of moves
+	 */
 	public void winner(Tray node) {
 		log("winner!");
 		for (String s: node.getMoves())
 			System.out.println(s);
 	}
 
+	/**
+	 * sets the debugging options
+	 * @param option the option from command line
+	 */
 	public static void setParams(String option) {
 		if (option.equals("-ooptions")) {
 			System.out.println("-odebug: print all debug info");
@@ -62,6 +86,11 @@ public class Solver {
 		}
 	}
 	
+	/**
+	 * loads a board from the file
+	 * @param file filename of the initial tray
+	 * @return a tray that has the information in the intial tray
+	 */
 	public static Tray loadBoard(String file) {
 		log("loading board: "+file);
 		InputSource source = new InputSource(file);
@@ -87,6 +116,12 @@ public class Solver {
 		return res;
 	}
 	
+	/**
+	 * create a new tray and load it with the data from the file
+	 * @param init the initial tray, which specifies the width/height
+	 * @param file the filename/path of the goal tray
+	 * @return a tray that has the information described in the goal tray
+	 */
 	public static Tray loadGoalBoard(Tray init, String file) {
 		log("loading goal board: "+file);
 		InputSource source = new InputSource(file);
@@ -109,6 +144,11 @@ public class Solver {
 		return res;
 	}
 	
+	/**
+	 * loads the files that describe the problem and solves the problem
+	 * @param initFile filename/path for the initial tray
+	 * @param goalFile filename/path for the goal tray
+	 */
 	public static void solveProblem(String initFile, String goalFile) {
 		log("starting to solve problem");
 		long startTime = System.currentTimeMillis();
@@ -122,6 +162,12 @@ public class Solver {
 			System.out.println("runtime: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
+	/**
+	 * main loop for the program.
+	 * @param args: if length 2, set the option specified
+	 * if length 2, solve the problem specified by the input files with no options
+	 * if length 3, solve the problem specified with the options turned on
+	 */
 	public static void main(String[] args){
 		if (args.length == 1) {
 			setParams(args[0]);
