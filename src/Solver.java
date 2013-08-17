@@ -35,6 +35,7 @@ public class Solver {
 			}
 		}
 		log("fringe reached end");
+		System.exit(1);
 	}
 
 	public void winner(Tray node) {
