@@ -21,21 +21,17 @@ public class BlockTest extends TestCase{
 	public void testOne() {
 		
 		Block b1 = new Block(0,0,0,0); // 1x1 block
-		System.out.println(b1.height());
 		assertTrue(b1.height()==1);
-		assertFalse(b1.width() == 3);
 		assertEquals(b1.toString(),"Block<(1x1)@[0,0]>");
-		
+		assertTrue(b1.id()==3);
 		
 		Block b2 = new Block(1,1,2,2); // 2x2 block
-		System.out.println(b2.height());
 		assertFalse(b2.height()==5);
 		assertTrue(b2.width()==2);
 		assertEquals(b2.toString(),"Block<(2x2)@[1,1]>");
-		
+		assertTrue(b2.id()==4);
 		
 		Block b3 = new Block(123,122,200,182); // random block
-		System.out.println(b3.height());
 		assertTrue(b3.height() == 78);
 		assertTrue(b3.width() == 61);
 		assertEquals(b3.toString(),"Block<(78x61)@[123,122]>");
@@ -72,15 +68,15 @@ public class BlockTest extends TestCase{
 	
 	
 	public void testEquals(){
-		Block b = new Block(123,182,200,122); // random block
-		Block c = new Block(123,182,200,122);
-		Block d = new Block(123,182,200,123);
+		Block b = new Block(123,100,200,122); // random block
+		Block c = new Block(123,100,200,122);
+		Block d = new Block(123,100,200,123);
 		assertTrue(b.equals(c));
 		assertFalse(b.equals(d));
 	}
 	
 	public void testClone(){
-		Block b = new Block(123,182,200,122); // random block
+		Block b = new Block(123,100,200,122); // random block
 		Block bclone = b.clone();
 		assertTrue(b.equals(bclone));
 	}
@@ -99,19 +95,19 @@ public class BlockTest extends TestCase{
 //	}
 
 	public void testMove(){
-		Block b = new Block(123,182,200,122);
+		Block b = new Block(123,100,200,122);
 		System.out.println(b.toString());
-		Block bu = new Block(122, 182, 199, 122); //up
+		Block bu = new Block(122, 100, 199, 122); //up
 		assertTrue(b.move('u').equals(bu));
 
-		Block bd = new Block(124, 182, 201, 122); //left
+		Block bd = new Block(124, 100, 201, 122); //left
 		assertTrue(b.move('d').equals(bd));
 	
 
-		Block bl = new Block(123, 181, 200, 121); //right
+		Block bl = new Block(123, 99, 200, 121); //right
 		assertTrue(b.move('l').equals(bl));
 		
-		Block br = new Block(123, 183, 200, 123); //left
+		Block br = new Block(123, 101, 200, 123); //left
 		assertTrue(b.move('r').equals(br));
 		
 		

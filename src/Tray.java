@@ -2,39 +2,52 @@ import java.util.*;
 
 public class Tray {
 
-	private static boolean iAmDebugging = true;
-	
 	private int height;
 	private int width;
 	private int[][] tray;
 	private HashMap<Integer, Block> blocks;
-	private int blockID;
-	// don't keep track of empty blocks since we will create a billion trays
-	// and keeping all the empty blocks will be very memory-intensive
-	
-	private String move;
+	private Stack<String> moves;
+	public static Tray goal;
+	// a double [0,1] that determines how close you are to goal state. lower is better
+	private double myHeuristic = 2;
+	private int hash = 0;
 	
 	public Tray(int trayHeight, int trayWidth){
 		this.height = trayHeight;
 		this.width = trayWidth;
 		tray = new int[trayHeight][trayWidth];
 		blocks = new HashMap<Integer, Block>();
-		blockID = 0;
-		move = null;
+		moves = new Stack<String>();			
+	}
+	
+	public void isOK() {
+		int[][] comparison = new int[height][width];
+		for (Integer id: blocks.keySet()) {
+			Block b = blocks.get(id);
+			for (int i=b.top();i<=b.bottom();i++)
+				for (int j=b.left();j<=b.right();j++) {
+					if (i >= height || j >= width)
+						throw new IllegalStateException("invalid coordinates in blocks");
+					if (comparison[i][j] != 0)
+						throw new IllegalStateException("conflicting block positinos");
+					comparison[i][j] = id;
+				}
+		}
+		for (int i=0; i<height; i++)
+			for (int j=0; j<width; j++)
+				if (tray[i][j] != comparison[i][j])
+					throw new IllegalStateException("descrepency between tray and blocks");
 	}
 	
 	public void add(Block b){
-		if(b.id() == 0){
-			blockID++;
-			b.setID(blockID);
-		}
 		for(int i=b.top(); i<=b.bottom(); i++)
 			for(int j=b.left(); j<=b.right(); j++) {
 				if (tray[i][j]!=0)
-					throw new IllegalStateException("conflicting block positions");
+					throw new IllegalStateException("adding block where one already exists");
 				tray[i][j] = b.id();
 			}
 		blocks.put(b.id(), b);
+		isOK();
 	}
 	
 	private void remove(Block b) {
@@ -44,10 +57,21 @@ public class Tray {
 				this.tray[i][j] = 0;
 	}
 	
+	public boolean equals(Object o){
+		return equals((Tray)o);
+	}
+	public boolean equals(Tray t) {
+		for (int i=0; i<height; i++)
+			for (int j=0; j<width; j++)
+				if (tray[i][j] != t.tray[i][j])
+					return false;
+		return true;
+	}
 	
+	@SuppressWarnings("unchecked")
 	public Tray clone(){
 		Tray clone = new Tray(this.height, this.width);
-		clone.blocks.putAll(this.blocks);
+		clone.blocks = (HashMap<Integer,Block>) blocks.clone();
 		for(int i = 0; i< tray.length; i++){
 			for(int j = 0; j< tray[i].length; j++){
 				clone.tray[i][j] = tray[i][j];
@@ -56,83 +80,44 @@ public class Tray {
 		return clone;
 	}
 	
-	public void convertToGoalTray(){
-		for(int i = 0; i < tray.length; i++)
-			for(int j = 0; j < tray[i].length; j++)
-				if(tray[i][j]==0)
-					tray[i][j] = -1;
-	}
-	
-	// Iterates through the tray to see if the equals are the same.
-	@Override
-	public boolean equals(Object t){
-		
-		Tray k = (Tray) t;
-		if(k.width != width || k.height != height)
-			return false;
-		for(int i=0; i<height; i++){
-			for(int j=0; j<width; j++){
-				int thisID = tray[i][j];
-				int otherID = k.tray[i][j];
-				if(otherID == -1 || thisID == -1) 
-					continue;
-				else if (thisID == 0 && otherID != 0 || 
-						otherID == 0 && thisID != 0)
-					return false;
-				else if (thisID == 0 && otherID == 0)
-					continue;
-				else{              
-					Block b1 = blocks.get(thisID);
-					Block b2 = k.blocks.get(otherID);
-					if (!b1.equals(b2))
-						return false;
-				}
-			}
+	public Double heuristic() {
+		if (myHeuristic <= 1) return myHeuristic;
+		if (goal.height != height || goal.width != width) {
+			System.out.print("warning: inconsistent sizes");
+			myHeuristic = 1.0;
+			return 1.0;
 		}
-		return true;
+		double finalscore = 0;
+		for (Block b: goal.blocks.values()) {
+			double score = 1;
+			for (Block b2: blocks.values()) {
+				if (!b.sameSize(b2)) continue;
+				double bscore = (double)b.manhattanDistance(b2)/(width+height);
+				if (bscore < score)
+					score = bscore;
+			}
+			finalscore += score;
+		}
+		myHeuristic = finalscore / goal.blocks.size();
+		return myHeuristic;
 	}
-	
+	public int compareTo(Object o) { 
+		return compareTo((Tray)o); 
+	}
+	public int compareTo(Tray t) {
+		return heuristic().compareTo(t.heuristic());
+	}
+
 	public String toString() {
-		String boardRep = new String();
-		for (int i = 0; i < tray.length; i++) {
-			for (int j = 0; j < tray[i].length; j++) {
-				boardRep += tray[i][j] + " | ";
+		String res = new String();
+		for (int i=0; i<height; i++) {
+			for (int j=0; j<width; j++) {
+				res += tray[i][j] + " ";
+				if (tray[i][j] < 10) res += " ";
 			}
-			boardRep += "\n";
+			res += "\n";
 		}
-		for(Block b : blocks.values()){
-			boardRep += b.toString() +"\n";
-		}
-		return boardRep;
-	}
-	
-	public int hashCode(){
-		int sum = 0;
-		for(Block b : blocks.values()){
-			sum += b.hashCode();
-		}
-		return sum;
-	}
-	
-	
-//	public int hashCode(){
-//		return this.toString().hashCode();
-//	}
-	
-	public static void main(String args[]){
-		Tray t = new Tray(5, 5);
-		Block b1 = new Block(2, 2, 3, 3);
-		System.out.println(b1.toString());
-		Block b2 = new Block(0, 0, 2, 1);
-		System.out.println(b2.toString());
-		
-		t.add(b1);
-		t.add(b2);
-		System.out.print(t.toString());
-		System.out.println();
-		t.convertToGoalTray();
-		System.out.print(t.toString());
-	
+		return res;
 	}
 	
 	/* returns 1 if the block at [i,j] can move in direction
@@ -141,35 +126,46 @@ public class Tray {
 	 * returns -1 if no block found at [i,j]
 	 * runs in O(1) time, provided block sizes aren't too big
 	 */
-	private int canMove(int x, int y, char direction) {
-		if (x<0 || x >= height || y<0 || y >= width) // out of bounds
+	private int canMove(int i, int j, char direction) {
+		if (i<0 || i>=height || j<0 || j>=width) // out of bounds
 			return -1;
-		if (tray[x][y] == 0) // empty space
+		int id = tray[i][j]; 
+		if (id == 0) // empty space
 			return -1;
-		int id = tray[x][y]; 
 		Block b = blocks.get(id);
 		if (direction == 'u') {
-			int x2 = x - 1;
-			if (x2 < 0) return 0;
+			int i2 = i - 1;
+			if (i2 < 0) return 0;
 			for (int j2=b.left(); j2<=b.right(); j2++)
-				if (tray[x2][j2] != 0) return 0;
+				if (tray[i2][j2] != 0) return 0;
 		} else if (direction == 'd') {
-			int i2 = x + 1;
+			int i2 = i + 1;
 			if (i2 >= height) return 0;
 			for (int j2=b.left(); j2<=b.right(); j2++)
 				if (tray[i2][j2] != 0) return 0;
 		} else if (direction == 'l') {
-			int j2 = y - 1;
+			int j2 = j - 1;
 			if (j2 < 0) return 0;
 			for (int i2=b.top(); i2<=b.bottom(); i2++)
 				if (tray[i2][j2] != 0) return 0;
 		} else if (direction == 'r') {
-			int j2 = y + 1;
+			int j2 = j + 1;
 			if (j2 >= width) return 0;
 			for (int i2=b.top(); i2<=b.bottom(); i2++)
 				if (tray[i2][j2] != 0) return 0;
 		}
 		return 1;
+	}
+	
+	public int hashCode() {
+		if (this.hash != 0) return this.hash;
+		int pow = 0;
+		for (int i=0; i<height; i++)
+			for (int j=0; j<height; j++) {
+				hash += Math.pow(65536, pow)*tray[i][j] % Integer.MAX_VALUE;
+				pow++;
+			}
+		return hash;
 	}
 	
 	/* iterates through all of the blank spaces, finds blocks above,
@@ -198,6 +194,7 @@ public class Tray {
 	 * runs in O(1) time, provided block sizes aren't too big
 	 * may be bottle necked by the .clone method
 	 */
+	@SuppressWarnings("unchecked")
 	private Tray invite(int i, int j, char d) {
 		// change direction to point in the direction that block will move
 		// change i, j to point to the block in that direction
@@ -211,29 +208,26 @@ public class Tray {
 		if (canMove(i, j, d) != 1) return null;
 		Block b = blocks.get(tray[i][j]); 
 		Tray t = this.clone();
+		t.moves = (Stack<String>)this.moves.clone();
+		t.moves.push(getMoveString(b, d));
 		t.remove(b);
-		t.move = generateMove(b, d);
-		//this adds all possible moves, not the correct move path.
-		//i need to delete off unwanted moves
 		t.add(b.move(d));
 		return t;
 	}
-	
-	private static String generateMove(Block a, Character direction){
-		
-		String s = a.top() + " " + a.left() + " ";
-		
-		switch(direction) {
-		case 'u': int topUp= a.top()-1; s+= topUp + " " + a.left(); break;
-		case 'd': int topDown = a.top()+1; s+= topDown + " " + a.left(); break;
-		case 'l': int topLeftL= a.left()-1; s+= a.top() + " " + topLeftL; break;
-		case 'r': int topLeftR= a.left()+1; s+= a.top() + " " + topLeftR; break;
-	}
-		//System.out.println(s);
-		return s;
+
+	private static String getMoveString(Block b, char d){
+		String res = b.top() + " " + b.left() + " ";
+		switch(d) {
+			case 'u': res += (b.top()-1) + " " + b.left(); break;
+			case 'd': res += (b.top()+1) + " " + b.left(); break;
+			case 'l': res += b.top() + " " + (b.left()-1); break;
+			case 'r': res += b.top() + " " + (b.left()+1); break;
+		}
+		return res;
 	}
 	
-	public String getMove(){
-		return move;
+	public Stack<String> getMoves(){
+		return moves;
 	}
+	
 }
