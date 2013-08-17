@@ -65,6 +65,7 @@ public class Tray implements Comparable<Tray>{
 		return equals((Tray)o);
 	}
 	public boolean equals(Tray t) {
+		if (t == null) return false;
 		for (Block b: blocks.values()) {
 			boolean good = false;
 			for (Block b2: t.blocks.values())
