@@ -24,9 +24,10 @@ public class Solver {
 		while (!fringe.isEmpty()) {
 			log("fringe size: "+fringe.size());
 			Tray node = fringe.poll();
-			if (node.heuristic() == 0)
+			if (node.heuristic() == 0){
 				winner(node);
-				
+				return;
+			}
 			visited.add(node);
 			for (Tray next: node.moves()) {
 				if (visited.contains(next)) continue;
@@ -42,7 +43,6 @@ public class Solver {
 		log("winner!");
 		for (String s: node.getMoves())
 			System.out.println(s);
-		System.exit(0);
 	}
 
 	public static void setParams(String option) {
