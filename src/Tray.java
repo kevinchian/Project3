@@ -9,9 +9,10 @@ public class Tray {
 	private int[][] tray;
 	private HashMap<Integer, Block> blocks;
 	private int blockID;
-	private String move;
 	// don't keep track of empty blocks since we will create a billion trays
 	// and keeping all the empty blocks will be very memory-intensive
+	
+	private String move;
 	
 	public Tray(int trayHeight, int trayWidth){
 		this.height = trayHeight;
@@ -20,10 +21,6 @@ public class Tray {
 		blocks = new HashMap<Integer, Block>();
 		blockID = 0;
 		move = null;
-	}
-	
-	public String move(){
-		return move;
 	}
 	
 	public void add(Block b){
@@ -67,13 +64,16 @@ public class Tray {
 	}
 	
 	// Iterates through the tray to see if the equals are the same.
-	public boolean equals(Tray t){
-		if(t.width != width || t.height != height)
+	@Override
+	public boolean equals(Object t){
+		
+		Tray k = (Tray) t;
+		if(k.width != width || k.height != height)
 			return false;
 		for(int i=0; i<height; i++){
 			for(int j=0; j<width; j++){
 				int thisID = tray[i][j];
-				int otherID = t.tray[i][j];
+				int otherID = k.tray[i][j];
 				if(otherID == -1 || thisID == -1) 
 					continue;
 				else if (thisID == 0 && otherID != 0 || 
@@ -83,7 +83,7 @@ public class Tray {
 					continue;
 				else{              
 					Block b1 = blocks.get(thisID);
-					Block b2 = t.blocks.get(otherID);
+					Block b2 = k.blocks.get(otherID);
 					if (!b1.equals(b2))
 						return false;
 				}
@@ -107,8 +107,17 @@ public class Tray {
 	}
 	
 	public int hashCode(){
-		return this.toString().hashCode();
+		int sum = 0;
+		for(Block b : blocks.values()){
+			sum += b.hashCode();
+		}
+		return sum;
 	}
+	
+	
+//	public int hashCode(){
+//		return this.toString().hashCode();
+//	}
 	
 	public static void main(String args[]){
 		Tray t = new Tray(5, 5);
@@ -124,21 +133,6 @@ public class Tray {
 		t.convertToGoalTray();
 		System.out.print(t.toString());
 	
-	}
-	
-	public void isOK(){ // need to fix it.
-		int[][] comparision = new int[height][width];
-		Tray comp = new Tray(height, width);
-		for (Block b: blocks.values())
-			for (int i=b.top();i<b.bottom();i++)
-				for (int j=b.left();i<b.right();j++) {
-					if (comparision[i][j] != 0)
-						throw new IllegalStateException("conflicting block positions");
-					else comparision[i][j] = b.id();
-
-				}
-		if (!comparision.equals(tray))
-			throw new IllegalStateException("inconsistency between blocks and tray");
 	}
 	
 	/* returns 1 if the block at [i,j] can move in direction
@@ -217,10 +211,29 @@ public class Tray {
 		if (canMove(i, j, d) != 1) return null;
 		Block b = blocks.get(tray[i][j]); 
 		Tray t = this.clone();
-		t.move = b.top() + " " + b.left();
 		t.remove(b);
+		t.move = generateMove(b, d);
+		//this adds all possible moves, not the correct move path.
+		//i need to delete off unwanted moves
 		t.add(b.move(d));
-		t.move += " " + b.move(d).top() + " " + b.move(d).left();
 		return t;
+	}
+	
+	private static String generateMove(Block a, Character direction){
+		
+		String s = a.top() + " " + a.left() + " ";
+		
+		switch(direction) {
+		case 'u': int topUp= a.top()-1; s+= topUp + " " + a.left(); break;
+		case 'd': int topDown = a.top()+1; s+= topDown + " " + a.left(); break;
+		case 'l': int topLeftL= a.left()-1; s+= a.top() + " " + topLeftL; break;
+		case 'r': int topLeftR= a.left()+1; s+= a.top() + " " + topLeftR; break;
+	}
+		//System.out.println(s);
+		return s;
+	}
+	
+	public String getMove(){
+		return move;
 	}
 }
