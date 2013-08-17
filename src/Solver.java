@@ -49,7 +49,10 @@ public class Solver {
 
 	public static void setParams(String option) {
 		if (option.equals("-ooptions")) {
-			System.out.println("-odebug: print debug info");
+			System.out.println("-odebug: print all debug info");
+			System.out.println("-otime: print time it takes to solve puzzle");
+			System.out.println("-oprint: print starting and ending tray");
+			System.exit(0);
 		} else if (option.equals("-odebug")) {
 			debugging = true;
 		} else if (option.equals("-otime")) {
@@ -120,9 +123,6 @@ public class Solver {
 	}
 	
 	public static void main(String[] args){
-		String folder = "hard";
-		String name = "d209";
-		solveProblem("tests/"+folder+"/"+name, "tests/"+folder+"/"+name+".goal");
 		if (args.length == 1) {
 			setParams(args[0]);
 		} if (args.length == 2) {
