@@ -7,6 +7,8 @@ public class Solver {
 	private PriorityQueue<Tray> fringe;
 
 	public static boolean debugging = false;
+	public static boolean printing = false;
+	public static boolean timing = false;
 
 	public Solver(Tray init, Tray goal){
 		Tray.goal = goal;
@@ -50,6 +52,10 @@ public class Solver {
 			System.out.println("-odebug: print debug info");
 		} else if (option.equals("-odebug")) {
 			debugging = true;
+		} else if (option.equals("-otime")) {
+			timing = true;
+		} else if (option.equals("-oprint")) {
+			printing = true; 
 		}
 	}
 	
@@ -104,19 +110,21 @@ public class Solver {
 		log("starting to solve problem");
 		long startTime = System.currentTimeMillis();
 		Tray init = loadBoard(initFile);
+		if (printing) init.printBoard();
 		Tray goal = loadGoalBoard(init, goalFile);
+		if (printing) goal.printBoard();
 		Solver s = new Solver(init, goal);
 		s.solve();
-		log("runtime: " + (System.currentTimeMillis() - startTime));
+		if (timing)
+			System.out.println("runtime: " + (System.currentTimeMillis() - startTime) + "ms");
 	}
 	
 	public static void main(String[] args){
-//		String folder = "hard";
-//		String name = "d209";
-//		solveProblem("tests/"+folder+"/"+name, "tests/"+folder+"/"+name+".goal");
+		String folder = "hard";
+		String name = "d209";
+		solveProblem("tests/"+folder+"/"+name, "tests/"+folder+"/"+name+".goal");
 		if (args.length == 1) {
 			setParams(args[0]);
-			System.exit(1);
 		} if (args.length == 2) {
 			solveProblem(args[0], args[1]);
 		} else if (args.length == 3) {
