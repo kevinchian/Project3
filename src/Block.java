@@ -1,7 +1,6 @@
 public class Block {
 		private int top, bottom, left, right;
-		private int id;
-		private static int idCounter;
+		public int id;
 		
 		//Block class constructor
 	public Block(int i1, int j1, int i2, int j2) {
@@ -11,8 +10,6 @@ public class Block {
 		this.right = j2;
 		if (top > bottom || left > right)
 			throw new IllegalArgumentException("invalid coordinates");
-		this.id = idCounter;
-		idCounter++;
 	}
 	
 	public String toString(){

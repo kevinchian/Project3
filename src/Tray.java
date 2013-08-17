@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Tray {
+public class Tray implements Comparable<Tray>{
 
 	private int height;
 	private int width;
@@ -39,7 +39,10 @@ public class Tray {
 					throw new IllegalStateException("descrepency between tray and blocks");
 	}
 	
+	private int idCounter = 1;
 	public void add(Block b){
+		b.id = idCounter;
+		idCounter++;
 		for(int i=b.top(); i<=b.bottom(); i++)
 			for(int j=b.left(); j<=b.right(); j++) {
 				if (tray[i][j]!=0)
@@ -55,23 +58,48 @@ public class Tray {
 		for(int i=b.top(); i<=b.bottom(); i++)
 			for(int j=b.left(); j<=b.right(); j++)
 				this.tray[i][j] = 0;
+		isOK();
 	}
 	
 	public boolean equals(Object o){
 		return equals((Tray)o);
 	}
 	public boolean equals(Tray t) {
-		for (int i=0; i<height; i++)
-			for (int j=0; j<width; j++)
-				if (tray[i][j] != t.tray[i][j])
-					return false;
+		for (Block b: blocks.values()) {
+			boolean good = false;
+			for (Block b2: t.blocks.values())
+				if (b.equals(b2))
+					good = true;
+			if (!good) return false;
+		}
 		return true;
+	}
+	public int hashCode() {
+		if (hash != 0) return hash;
+		HashMap<Integer, Integer> mapping = new HashMap<Integer, Integer>();
+		int pow = 0;
+		int nextInt = 1;
+		for (int i=0; i<height; i++)
+			for (int j=0; j<width; j++) {
+				int id = tray[i][j];
+				if (!mapping.containsKey(id)) {
+					mapping.put(id, nextInt);
+					nextInt++;
+				}
+				else {
+					int map = mapping.get(id).intValue();
+					hash += map * (Math.pow(256, pow) % Integer.MAX_VALUE);
+					pow++;
+				}
+			}
+		return hash;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Tray clone(){
 		Tray clone = new Tray(this.height, this.width);
 		clone.blocks = (HashMap<Integer,Block>) blocks.clone();
+		clone.idCounter = idCounter;
 		for(int i = 0; i< tray.length; i++){
 			for(int j = 0; j< tray[i].length; j++){
 				clone.tray[i][j] = tray[i][j];
@@ -83,7 +111,6 @@ public class Tray {
 	public Double heuristic() {
 		if (myHeuristic <= 1) return myHeuristic;
 		if (goal.height != height || goal.width != width) {
-			System.out.print("warning: inconsistent sizes");
 			myHeuristic = 1.0;
 			return 1.0;
 		}
@@ -101,14 +128,15 @@ public class Tray {
 		myHeuristic = finalscore / goal.blocks.size();
 		return myHeuristic;
 	}
-	public int compareTo(Object o) { 
-		return compareTo((Tray)o); 
-	}
 	public int compareTo(Tray t) {
 		return heuristic().compareTo(t.heuristic());
 	}
 
 	public String toString() {
+		return "Tray<("+height+"x"+width+") "+blocks.values().size()+" blocks>"; 
+	}
+	
+	public void printBoard() {
 		String res = new String();
 		for (int i=0; i<height; i++) {
 			for (int j=0; j<width; j++) {
@@ -117,8 +145,11 @@ public class Tray {
 			}
 			res += "\n";
 		}
-		return res;
+		System.out.println(res);
 	}
+	
+	public int height() { return height; }
+	public int width() { return width; }
 	
 	/* returns 1 if the block at [i,j] can move in direction
 	 * direction is either u, d, l, or r
@@ -155,17 +186,6 @@ public class Tray {
 				if (tray[i2][j2] != 0) return 0;
 		}
 		return 1;
-	}
-	
-	public int hashCode() {
-		if (this.hash != 0) return this.hash;
-		int pow = 0;
-		for (int i=0; i<height; i++)
-			for (int j=0; j<height; j++) {
-				hash += Math.pow(65536, pow)*tray[i][j] % Integer.MAX_VALUE;
-				pow++;
-			}
-		return hash;
 	}
 	
 	/* iterates through all of the blank spaces, finds blocks above,

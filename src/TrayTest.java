@@ -18,8 +18,8 @@ public class TrayTest extends TestCase {
 		t2.add(b1);
 		t2.add(b2);
 		t2.add(b3);
-		assertTrue(t.hashCode() != t2.hashCode());
 		Tray.goal = t2;
+		assertFalse(t.hashCode() == t2.hashCode());
 		assertTrue(t.heuristic()==0);
 	}
 	
